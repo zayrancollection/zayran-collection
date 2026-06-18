@@ -8,7 +8,7 @@
 <style>
 body{
     margin:0;
-    font-family:Arial;
+    font-family:Arial, sans-serif;
     background:#0B0B0B;
     color:#fff;
 }
@@ -53,11 +53,13 @@ header{
 
 .section{
     padding:40px 20px;
+    max-width: 600px;
+    margin: 0 auto;
 }
 
 .card{
     background:#171717;
-    padding:15px;
+    padding:20px;
     margin-bottom:15px;
     border-radius:10px;
 }
@@ -67,11 +69,36 @@ header{
     font-weight:bold;
 }
 
+/* --- PAYMENT SECTION STYLE --- */
+.payment-section {
+    text-align: center;
+    padding: 30px 20px;
+    background: #111;
+    border-radius: 15px;
+    margin: 30px 20px;
+}
+
+.payment-section img {
+    border-radius: 10px;
+    margin: 15px 0;
+    border: 3px solid #fff;
+}
+
+.upi-id {
+    font-family: monospace;
+    background: #222;
+    padding: 8px 15px;
+    border-radius: 5px;
+    display: inline-block;
+    color: #D4AF37;
+    word-break: break-all;
+}
+
 footer{
     text-align:center;
     padding:20px;
     background:#111;
-    margin-top:20px;
+    margin-top:40px;
 }
 
 .whatsapp{
@@ -84,6 +111,8 @@ footer{
     border-radius:50px;
     text-decoration:none;
     font-weight:bold;
+    z-index: 1000;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
 }
 </style>
 
@@ -115,20 +144,24 @@ footer{
 <p>Condition: 8.5/10</p>
 <p class="price">₹1299</p>
 </div>
+</section>
 
+<!-- Ab Payment Section ekdum sahi jagah par hai -->
+<section class="payment-section">
+<h2 style="color:#D4AF37; margin-top: 0;">Pay via UPI</h2>
+<img src="GooglePay_QR.png" alt="UPI QR Code" width="220">
+<p>Scan to pay with any UPI app</p>
+<p class="upi-id">zk9118911@okaxis</p>
 </section>
 
 <footer>
 © 2026 Zayran Collective
 </footer>
 
-<a class="whatsapp" href="https://wa.me/919105704376">
+<!-- Floating WhatsApp Button -->
+<a class="whatsapp" href="https://wa.me/919105704376" target="_blank">
 WhatsApp
 </a>
-<h2>Pay via UPI</h2>
 
-<img src="GooglePay_QR.png" alt="UPI QR Code" width="220">
-
-<p>UPI ID: zk9118911@okaxis</p>
 </body>
 </html>
