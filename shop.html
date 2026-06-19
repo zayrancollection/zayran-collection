@@ -52,6 +52,24 @@
             text-decoration: none;
         }
 
+        /* NAV LINKS FOR EASY NAVIGATION */
+        .nav-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav-links a {
+            color: var(--text-color);
+            text-decoration: none;
+            font-size: 15px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+
+        .nav-links a:hover, .nav-links a.active {
+            color: var(--primary-color);
+        }
+
         .nav-icons {
             display: flex;
             gap: 20px;
@@ -125,12 +143,23 @@
             outline: none;
         }
 
-        /* CATALOG TITLE */
+        /* TITLES */
         .main-title {
             text-align: center;
             margin: 20px 0;
             color: var(--primary-color);
             font-size: 28px;
+        }
+
+        .section-title {
+            max-width: 1200px;
+            margin: 40px auto 10px auto;
+            padding: 0 5%;
+            color: #ff3366;
+            font-size: 24px;
+            display: none; /* Khali hone par hidden rahega */
+            border-bottom: 1px dashed #ff3366;
+            padding-bottom: 10px;
         }
 
         /* PRODUCT GRID */
@@ -172,16 +201,6 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
-        }
-
-        /* Agar image miss ho toh fallback style */
-        .product-img[alt] {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            padding: 20px;
-            color: var(--text-muted);
         }
 
         .card-badge {
@@ -296,7 +315,7 @@
             background-color: #e6b800;
         }
 
-        /* FOOTER & T&C SECTION */
+        /* FOOTER */
         footer {
             background-color: var(--card-bg);
             padding: 40px 5%;
@@ -338,9 +357,16 @@
 
     <header>
         <div class="navbar">
-            <a href="#" class="logo">Zayran Collection</a>
+            <a href="index.html" class="logo">Zayran Collection</a>
+            
+            <nav class="nav-links">
+                <a href="index.html">Home</a>
+                <a href="shop.html" class="active">Shop</a>
+                <a href="#wishlist-section" onclick="scrollToWishlist()">My Wishlist</a>
+            </nav>
+
             <div class="nav-icons">
-                <button class="wishlist-icon-btn" onclick="alert('Wishlist feature connected! Scroll to check saved items.')">
+                <button class="wishlist-icon-btn" onclick="scrollToWishlist()">
                     ❤️ <span class="badge-count" id="wishlist-badge">0</span>
                 </button>
             </div>
@@ -367,6 +393,9 @@
             </select>
         </div>
     </section>
+
+    <h2 class="section-title" id="wishlist-title">❤️ Your Saved Favorites</h2>
+    <div class="product-grid" id="wishlist-container"></div>
 
     <h2 class="main-title">New Arrivals & Premium Catalog</h2>
 
@@ -395,7 +424,6 @@
     </footer>
 
     <script>
-        // AAPKA COMPLETE PRODUCT CATALOG DATA HERE
         const catalogProducts = [
             {
                 id: 1,
@@ -406,7 +434,7 @@
                 price: 1499,
                 oldPrice: 2999,
                 badge: "New Arrival",
-                image: "images/nike-sweatshirt.jpg", // Create 'images' folder in GitHub & save file there
+                image: "images/nike-sweatshirt.jpg", 
                 rating: "⭐⭐⭐⭐★",
                 reviews: 14
             },
@@ -453,46 +481,71 @@
 
         let wishlist = JSON.parse(localStorage.getItem('zayran_wishlist')) || [];
 
-        // RENDER PRODUCTS TO SCREEN
+        // GENERATE CARD HTML TEMPLATE
+        function createProductCard(product, isWishlistContainer = false) {
+            const isSaved = wishlist.includes(product.id) ? 'active' : '';
+            return `
+                <div class="product-card">
+                    <div class="image-wrapper">
+                        <span class="card-badge">${product.badge}</span>
+                        <button class="wishlist-btn ${isSaved}" onclick="toggleWishlist(${product.id}, this)">❤️</button>
+                        <img class="product-img" src="${product.image}" alt="${product.name}">
+                    </div>
+                    <div class="product-details">
+                        <span class="product-brand">${product.brand}</span>
+                        <h3 class="product-title">${product.name}</h3>
+                        <p class="product-spec"><b>Condition:</b> ${product.condition}/10 &nbsp;|&nbsp; <b>Size:</b> ${product.size}</p>
+                        <div class="rating-section">${product.rating} <span class="review-count">(${product.reviews})</span></div>
+                        <div class="price-row">
+                            <span class="current-price">₹${product.price}</span>
+                            <span class="old-price">₹${product.oldPrice}</span>
+                        </div>
+                        <button class="whatsapp-cta" onclick="redirectToWhatsApp('${product.name}', '${product.size}', '${product.price}')">
+                            Order via WhatsApp
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // DISPLAY CATALOG AND WISHLIST GRIDS
         function displayProducts(productsList) {
             const container = document.getElementById('product-container');
             container.innerHTML = "";
 
             if(productsList.length === 0) {
                 container.innerHTML = `<div style="grid-column: 1/-1; text-align: center; color: #aaa; padding: 40px;">No premium products found matching your search.</div>`;
-                return;
+            } else {
+                productsList.forEach(product => {
+                    container.innerHTML += createProductCard(product);
+                });
             }
+            
+            renderWishlistSection();
+        }
 
-            productsList.forEach(product => {
-                const isSaved = wishlist.includes(product.id) ? 'active' : '';
-                const cardHTML = `
-                    <div class="product-card">
-                        <div class="image-wrapper">
-                            <span class="card-badge">${product.badge}</span>
-                            <button class="wishlist-btn ${isSaved}" onclick="toggleWishlist(${product.id}, this)">❤️</button>
-                            <img class="product-img" src="${product.image}" alt="${product.name} (Image not uploaded)">
-                        </div>
-                        <div class="product-details">
-                            <span class="product-brand">${product.brand}</span>
-                            <h3 class="product-title">${product.name}</h3>
-                            <p class="product-spec"><b>Condition:</b> ${product.condition}/10 &nbsp;|&nbsp; <b>Size:</b> ${product.size}</p>
-                            <div class="rating-section">${product.rating} <span class="review-count">(${product.reviews})</span></div>
-                            <div class="price-row">
-                                <span class="current-price">₹${product.price}</span>
-                                <span class="old-price">₹${product.oldPrice}</span>
-                            </div>
-                            <button class="whatsapp-cta" onclick="redirectToWhatsApp('${product.name}', '${product.size}', '${product.price}')">
-                                Order via WhatsApp
-                            </button>
-                        </div>
-                    </div>
-                `;
-                container.innerHTML += cardHTML;
-            });
+        // LIVE REAL-TIME WISHLIST RENDERER
+        function renderWishlistSection() {
+            const wishlistContainer = document.getElementById('wishlist-container');
+            const wishlistTitle = document.getElementById('wishlist-title');
+            wishlistContainer.innerHTML = "";
+
+            const savedItems = catalogProducts.filter(p => wishlist.includes(p.id));
+
+            if (savedItems.length > 0) {
+                wishlistTitle.style.display = "block";
+                wishlistContainer.style.display = "grid";
+                savedItems.forEach(product => {
+                    wishlistContainer.innerHTML += createProductCard(product, true);
+                });
+            } else {
+                wishlistTitle.style.display = "none";
+                wishlistContainer.style.display = "none";
+            }
             document.getElementById('wishlist-badge').innerText = wishlist.length;
         }
 
-        // LIVE FILTER & SEARCH LOGIC
+        // LIVE FILTER LOGIC
         function applyFilters() {
             const searchVal = document.getElementById('search-input').value.toLowerCase();
             const sizeVal = document.getElementById('size-filter').value;
@@ -509,17 +562,27 @@
             displayProducts(filtered);
         }
 
-        // WISHLIST MEMORY FUNCTION
-        function toggleWishlist(id, element) {
+        // WISHLIST TOGGLE WITH AUTO UPDATE
+        function toggleWishlist(id) {
             if (wishlist.includes(id)) {
                 wishlist = wishlist.filter(item => item !== id);
-                element.classList.remove('active');
             } else {
                 wishlist.push(id);
-                element.classList.add('active');
             }
             localStorage.setItem('zayran_wishlist', JSON.stringify(wishlist));
-            document.getElementById('wishlist-badge').innerText = wishlist.length;
+            
+            // Auto update catalog and wishlist components
+            applyFilters();
+        }
+
+        // SCROLL SMOOTH TO WISHLIST
+        function scrollToWishlist() {
+            const title = document.getElementById('wishlist-title');
+            if(wishlist.length === 0) {
+                alert("Your wishlist is currently empty. Tap ❤️ on items above to add them!");
+                return;
+            }
+            title.scrollIntoView({ behavior: 'smooth' });
         }
 
         // AUTOMATED WHATSAPP ORDER FORMATTING
@@ -536,4 +599,4 @@
         };
     </script>
 </body>
-</html>
+    </html>
